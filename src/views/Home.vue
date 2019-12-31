@@ -2,20 +2,22 @@
   <div class="home">
     <van-nav-bar title="标题" left-text="返回" left-arrow>
       <van-icon name="search" slot="left" />
-      <van-icon name="cart" slot="right" />
+      <van-icon slot="right">{{userInfo.userName}}</van-icon>
     </van-nav-bar>
 
-    <van-swipe :autoplay="3000">
-      <van-swipe-item v-for="(image, index) in images" :key="index">
-        <img v-lazy="image" />
-      </van-swipe-item>
-    </van-swipe>
+    <div class="adswiper-container">
+      <swiper :options="adSwiperOption">
+        <swiper-slide class="swiper-slide" v-for="(image, key) in images" :key="key" :style="{backgroundImage: 'url(' + image +')'}"> 
+        </swiper-slide>
+        <div class="swiper-pagination" id="pagination" slot="pagination"></div>
+      </swiper>
+    </div>
 
     <div class="hot">
       <p class="hot-title border-bottom">最热商品</p>
       <div>
-        <swiper :options="swiperOption">
-          <swiper-slide v-for="(item, index) in swiperSlideList" :key="index">
+        <swiper :options="hotSwiperOption">
+          <swiper-slide v-for="(item, index) in hotList" :key="index">
             <div>
               <img :src="item.imgUrl"/>
             </div>
@@ -39,26 +41,48 @@
  
 <script>
 import Mock from 'mockjs'
+import { mapState } from 'vuex';
 
 export default {
   data() {
     return {
       images: [
         'https://img.yzcdn.cn/vant/apple-1.jpg',
-        'https://img.yzcdn.cn/vant/apple-2.jpg'
+        'https://img.yzcdn.cn/vant/apple-2.jpg',
       ],
-      swiperOption: {
+      adSwiperOption: {
+        effect : 'coverflow',
+        centeredSlides: true,
+        spaceBetween: '10%',
+        slidesPerView: 'auto',
+        loop: true,
+        autoplay:true,
+        coverflowEffect: {
+          rotate: 0,
+          stretch: 1,
+          depth: 300,
+          modifier: 0.6,
+          slideShadows: false,
+        },
+        pagination: {
+          el: '.swiper-pagination',
+        },
+      },
+      hotSwiperOption: {
         slidesPerView: 3.3
       },
-      swiperSlideList: [],
+      hotList: [],
       recommendList: []
     }
   },
+  computed: {
+    ...mapState(['userInfo']),
+  },
   created() {
-    this.mockFn()
-    this.randomMockFn()
-    this.getSwiperSlideList()
-    this.getRecommendList()
+    // this.mockFn()
+    // this.randomMockFn()
+    // this.getHotList()
+    // this.getRecommendList()
   },
   methods: {
     randomMockFn() {
@@ -78,7 +102,7 @@ export default {
       Mock.mock('/recommendList', 'post', recommendData);
     },
     mockFn() {
-      Mock.mock('/swiperSlideList', 'get', {
+      Mock.mock('/hotList', 'get', {
         'data|10-20': [
           {
             imgUrl: '@image(200x200)',
@@ -87,14 +111,14 @@ export default {
         ]
       })
     },
-    getSwiperSlideList() {
-      this.$http.get('/swiperSlideList').then(({ data }) => {
-        this.swiperSlideList = data.data
+    getHotList() {
+      this.$http.get('/hotList', ({data}) => {
+        this.hotList = data.data;
       })
     },
     getRecommendList() {
-      this.$http.post('/recommendList').then(({ data }) => {
-        this.recommendList = data
+      this.$http.post('/recommendList', ({data}) => {
+        this.recommendList = data.data;
       })
     }
   }
@@ -112,15 +136,40 @@ export default {
     width 100%
     .van-icon
       font-size 20px
-  .van-swipe
-    margin-top 50px
+    .van-nav-bar__right
+      i
+        font-size 14px
+  .adswiper-container
     width 100%
-    height 150px
-    &-item
-      background-color #f2f2f2
-      img
-        width 100%
-        height 100%
+    margin-top 50px
+    overflow hidden
+    padding 5px 0 0 0
+    .swiper-container
+      width 100%
+      .swiper-wrapper
+        .swiper-slide
+          background-position center
+          background-size cover
+          background-color #f2f2f2
+          width 325px
+          height 150px
+          border-radius 4px
+      /deep/ .swiper-pagination
+        height 20px
+        font-size 12px
+        color #fff
+        letter-spacing 0
+        line-height 20px
+        bottom 0
+        &-bullet
+          background #fff
+          opacity 0.8
+          height 5px
+          border-radius 4px
+          width 5px
+          transition all 0.2s
+        &-bullet-active
+          width 20px
   .hot
     background-color #ffffff
     margin-top 5px
@@ -145,7 +194,7 @@ export default {
             box-sizing border-box
         p
           font-size 14px
-          margin-top 2px
+          margin-top 4px
           padding 0 4px
           height 30px
           line-height 15px
