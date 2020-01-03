@@ -8,23 +8,56 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    components: {
+      default: Home,
+      'footer-bar': () => import('@/components/FooterBar.vue'),
+    },
+    meta: {
+      keepAlive: true
+    }
   },
   {
     path: '/record',
     name: 'record',
-    component: () => import('@/views/Record.vue')
+    components: {
+      default: () => import('@/views/Record.vue'),
+      'footer-bar': () => import('@/components/FooterBar.vue'),
+    },
+    meta: {
+      keepAlive: true
+    }
   },
   {
     path: '/cart',
     name: 'cart',
-    component: () => import('@/views/Cart.vue')
+    components: {
+      default: () => import('@/views/Cart.vue'),
+      'footer-bar': () => import('@/components/FooterBar.vue'),
+    },
+    meta: {
+      keepAlive: true
+    }
   },
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/Profile.vue')
+    components: {
+      default: () => import('@/views/Profile.vue'),
+      'footer-bar': () => import('@/components/FooterBar.vue'),
+    },
+    meta: {
+      keepAlive: true
+    }
   },
+  {
+    path: '/detail/:id',
+    name: 'detail',
+    component: () => import('@/views/Detail.vue')
+  },
+  {
+    path: '*',
+    component: () => import('@/views/Error.vue')
+  }
 ]
 
 const router = new VueRouter({

@@ -79,11 +79,19 @@ export default {
           userName: this.loginUsername,
           password: this.loginPassword
         }, (data) => {
-          this.actionLogin(data.userName);
-          this.$toast.success(data.message);
-          this.$router.push('/');
+          if(data.code === 200) {
+            this.actionLogin(data);
+            this.$toast.success(data.message);
+            setTimeout(() => {
+              this.$router.go(-1);
+            },2000)
+          } else {
+            this.$toast.fail(data.message);
+          }
+          this.isLoding =  false;
         }, (data) => {
           this.$toast.fail(data.message);
+          this.isLoding =  false;
         })
     },
     registerHandel() {
@@ -99,9 +107,15 @@ export default {
           userName: this.registerUsername,
           password: this.registerPassword
         }, (data) => {
-          this.$toast.success(data.message);
+          if (data.code === 200) {
+            this.$toast.success(data.message);
+          } else {
+            this.$toast(data.message);
+          }
+          this.isLoding =  false;
         }, (data) => {
           this.$toast.fail(data.message);
+          this.isLoding =  false;
         })
       }
       
